@@ -50,7 +50,7 @@ def parse_graph_data(text):
                 y += c
             else:
                 robot_list[list_index] = 0 # so that robot isn't none
-        robot_list[list_index] = {"dist": -1, "coord": (int(x),int(y)), "dest": None, "state": 1 if list_index == 0 else 0, "id": list_index}
+        robot_list[list_index] = {"dist": [], "coord": (int(x),int(y)), "dest": [], "state": "awake" if list_index == 0 else "asleep", "id": list_index}
         k += 1
 
 
