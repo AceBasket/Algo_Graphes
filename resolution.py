@@ -20,7 +20,7 @@ def max(x,y):
 
 def awake(robot_List,i, graph):
     robot_List[i]["state"] = "awake"
-    find_Dest(i, robot_List, max, graph)
+    find_Dest(i, i, robot_List, max, graph)
 
 def relacher_init(i,graph):
     d = []
@@ -58,35 +58,29 @@ def dijkstra(i, graph):
         u = ind_min(d, Y)
         Y[u] = 0
         for  v in range(len(graph[u])): 
-            #print("v=",v,"\n")
             if Y[v] == 1 and graph[u][v]!= 0:
                 relacher(u, v, d, pere, graph)
     return (d, pere)
 
-def find_Dest(id, robot_List, test, graph):
-    dist,pere = dijkstra(id,graph) # dist = tableau des distances à id et père = tableau des antécedents pour relier à id
+def find_Dest(id, id_position, robot_List, test, graph):
+    dist,pere = dijkstra(id_position, graph) # dist = tableau des distances à id et père = tableau des antécedents pour relier à id
     if test == min:
         test_dist = np.inf
     else:
         test_dist =0
     ind = None
     for i in range(len(dist)):
-        if test(dist[i], test_dist) and i != id and robot_List[i]["state"] == "asleep":
+        if test(dist[i], test_dist) and i != id_position and robot_List[i]["state"] == "asleep":
             test_dist = dist[i]
             ind = i
     if ind != None: 
         first_dest = ind 
-       # print(first_dest)
         list_dest = [first_dest] # list_dest = chemin à faire pour relier id à sa destination
         list_dist = [dist[first_dest]] # list_dist = list des distances associé à list_dest
-        # print("list_dest= ",list_dest,"\n")
-        # print("list_dist= ",list_dist,"\n")
-        while pere[first_dest] != id:
+        while pere[first_dest] != id_position:
             first_dest = pere[first_dest]
             list_dest.append(first_dest)
             list_dist.append(dist[first_dest])
-        # print("list_dest= ",list_dest,"\n")
-        # print("list_dist= ",list_dist,"\n")
         for robot in list_dest: # On réserve tout les robots à reveiller en chemin
             if robot_List[robot]["state"] == "asleep":
                 robot_List[robot]["state"] = "reserved"
@@ -98,37 +92,35 @@ def find_Dest(id, robot_List, test, graph):
 
 
 def move_Robots(robot_List, graph):
-    for i in range(len(robot_List)):
-        robot = robot_List[i]
+    for robot in robot_List:
         if robot["state"] == "awake" and len(robot["dist"]) > 0:
             for k in range(len(robot["dest"])): # On décremente de 1 toutes les distances de "dist"
                 robot["dist"][k] -=1
             if robot["dist"][0] == 0: # Si la plus courte distance tombe à 0... 
-                robot["coord"] = robot_List[robot["dest"][0]]["coord"] # ...on modifie les coordonées du robot...
                 awake(robot_List, robot["dest"][0],graph) # ...on réveille le robot correspondant...
-                robot["dest"].pop(0)
+                id_dest = robot["dest"].pop(0)
                 robot["dist"].pop(0)
                 if len(robot["dest"]) == 0:
-                    find_Dest(i, robot_List, min, graph) # ...et on lui assigne sa destination
+                    find_Dest(robot["id"], id_dest, robot_List, min, graph) # ...et on lui assigne sa destination
 
 def robots_all_awake(robot_List):
     for robot in robot_List:
         if robot["state"] != "awake":
-           # print("Pas tous réveillé")
             return 0
-    #print("Tous réveillé")
     return 1
 
-def bjr():
+def bjr(): 
     robot_list, graph = parse_graph_data("graphe.txt")
     tour = 1
-    print("graph: ", graph, "\n")
+    #print("graph: ", graph, "\n")
     print(tour,"\n",robot_list,"\n")
-    find_Dest(0,robot_list, min, graph)
+    find_Dest(0, 0, robot_list, min, graph)
     while not robots_all_awake(robot_list):
         tour +=1
         move_Robots(robot_list, graph)
-    #    print(tour,"\n",robot_list,"\n")
+        print(tour,"\n",robot_list,"\n")
+        if tour >19:
+            return 0
     print("Robot tous réveillé en ",tour,"tours.")
     return 0
 
