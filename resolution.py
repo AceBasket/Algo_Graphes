@@ -122,13 +122,13 @@ def robots_all_awake(robot_List):
 def bjr():
     robot_list, graph = parse_graph_data("graphe.txt")
     tour = 1
-    #print("graph: ", graph, "\n")
+    print("graph: ", graph, "\n")
     print(tour,"\n",robot_list,"\n")
     find_Dest(0,robot_list, min, graph)
     while not robots_all_awake(robot_list):
         tour +=1
         move_Robots(robot_list, graph)
-        print(tour,"\n",robot_list,"\n")
+    #    print(tour,"\n",robot_list,"\n")
     print("Robot tous réveillé en ",tour,"tours.")
     return 0
 

@@ -1,3 +1,4 @@
+from math import ceil
 import numpy as np
 
 """ 
@@ -10,7 +11,7 @@ robot :
 
 
 def distance(A: tuple, B: tuple):
-    return np.sqrt((A[0] + B[0])**2 + (A[1] + B[1])**2)
+    return np.sqrt((A[0] - B[0])**2 + (A[1] - B[1])**2)
 
 def count_robot(lines):
     k = 0
@@ -62,8 +63,8 @@ def parse_graph_data(text):
         i =  0 if data[0] == 'R' else int(data[0])
         j =  0 if data[2] == 'R' else int(data[2])
         dist = distance(robot_list[i]["coord"], robot_list[j]["coord"])
-        graph[j][i] = int(dist) + 1 
-        graph[i][j] = int(dist) + 1
+        graph[j][i] = ceil(dist) 
+        graph[i][j] = ceil(dist)
         k += 1
 
 
