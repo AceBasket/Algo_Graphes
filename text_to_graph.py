@@ -8,7 +8,8 @@ robot :
     dest : id of the robot which is its destination
     state : 0 for asleep ; 1 for awake ; 2 for in stand by
 """
-
+def get_correct_index(list_ids, id):
+    return list_ids.index(id)
 
 def distance(A: tuple, B: tuple):
     return np.sqrt((A[0] - B[0])**2 + (A[1] - B[1])**2)
@@ -30,11 +31,10 @@ def parse_graph_data(text):
     nb_robot = count_robot(lines)
     print(nb_robot)
     robot_list = [None for k in range(nb_robot)]
-
+    list_ids = []
     k = 0
     while k < nb_robot: # for each robot
         data, line = get_data_from_line(lines[k])
-        print(line)
         # to get index for robot_list and id for robot
 
         id = ''
@@ -43,24 +43,22 @@ def parse_graph_data(text):
 
         if id == 'R':
             list_index = 0
-        # elif line[0] <= '9' and line[0] >= '0':
-        #     list_index = int(line[0])
         else:
             list_index = int(id)
-
-        print(list_index)
+        list_ids.append(list_index)
         # to get robot coordinates
-        robot_list[list_index] = None
+        i = get_correct_index(list_ids, list_ids[-1])
+        robot_list[i] = None
         x = ''
         y = ''
         for c in data:
-            if c != ',' and robot_list[list_index] == None:
+            if c != ',' and robot_list[i] == None:
                 x += c
             elif c != ',':
                 y += c
             else:
-                robot_list[list_index] = 0 # so that robot isn't none
-        robot_list[list_index] = {"dist": [], "coord": (int(x),int(y)), "dest": [], "state": "awake" if list_index == 0 else "asleep", "id": list_index}
+                robot_list[i] = 0 # so that robot isn't none
+        robot_list[i] = {"dist": [], "coord": (int(x),int(y)), "dest": [], "state": "awake" if i == 0 else "asleep", "id": list_index}
         k += 1
 
 
@@ -79,17 +77,20 @@ def parse_graph_data(text):
                 nb1 += c
             else:
                 nb2 += c
-        i =  0 if nb1 == 'R' else int(nb1)
-        j =  0 if nb2 == 'R' else int(nb2)
+        id1 =  0 if nb1 == 'R' else int(nb1)
+        id2 =  0 if nb2 == 'R' else int(nb2)
+        i = get_correct_index(list_ids, id1)
+        j = get_correct_index(list_ids, id2)
         dist = distance(robot_list[i]["coord"], robot_list[j]["coord"])
         graph[j][i] = ceil(dist) 
         graph[i][j] = ceil(dist)
         k += 1
 
 
-    return robot_list, graph
+    return list_ids, robot_list, graph
 
 if __name__ == "__main__":
-    robot_list, graph = parse_graph_data("graphe2.txt")
+    list_ids, robot_list, graph = parse_graph_data("graphe2.txt")
+    print(list_ids)
     print(robot_list)
     print(graph)
