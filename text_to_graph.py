@@ -28,13 +28,13 @@ def parse_graph_data(text):
         lines = f.readlines()
 
     nb_robot = count_robot(lines)
-    print(nb_robot)
+    # print(nb_robot)
     robot_list = [None for k in range(nb_robot)]
 
     k = 0
     while k < nb_robot: # for each robot
         data, line = get_data_from_line(lines[k])
-        print(line)
+        #print(line)
         # to get index for robot_list and id for robot
 
         id = ''
@@ -48,7 +48,7 @@ def parse_graph_data(text):
         else:
             list_index = int(id)
 
-        print(list_index)
+        #print(list_index)
         # to get robot coordinates
         robot_list[list_index] = None
         x = ''

@@ -51,7 +51,7 @@ def ind_min(tab, Y):
             ind = i
     return ind
 
-def ind_robo_id(robot_List, id):
+def ind_robot_id(robot_List, id):
     for ind in range(len(robot_List)):
         if robot_List[ind]["id"] == id:
             return ind
@@ -120,12 +120,16 @@ def move_Robots(robot_List, graph, what_to_do):
         if robot["state"] == "awake" and len(robot["dist"]) > 0:
             for k in range(len(robot["dest"])): # On décremente de 1 toutes les distances de "dist"
                 robot["dist"][k] -=1
-            if robot["dist"][0] == 0: # Si la plus courte distance tombe à 0... 
-                what_to_do(robot["id"], robot_List, graph, state)
-                if state == max:
-                    state = min
+            if robot["dist"][0] == 0:
+                if robot_List[ind_robot_id(robot_List, robot["dest"][0])]["state"] != "awake": # Si la plus courte distance tombe à 0... 
+                    what_to_do(robot["id"], robot_List, graph, state)
+                    if state == max:
+                        state = min
+                    else:
+                        state = max
                 else:
-                    state = max
+                    robot["dist"].pop(0)
+                    robot["dest"].pop(0)
 
 def robots_all_awake(robot_List):
     for robot in robot_List:
@@ -134,21 +138,22 @@ def robots_all_awake(robot_List):
     return 1
 
 def bjr(): 
-    robot_list, graph = parse_graph_data("graphe2.txt")
+    robot_list, graph = parse_graph_data("graphe.txt")
     tour = 1
     #print("graph: ", graph, "\n")
-    print("\n", tour)
-    for robot in robot_list:
-        print(robot)
+    # print("\n", tour)
+    # for robot in robot_list:
+    #     print(robot)
     find_Dest(0, 0, robot_list, min, graph)
     while not robots_all_awake(robot_list):
         tour +=1
-        move_Robots(robot_list, graph, what_to_do1)
-        print("\n",tour)
-        for robot in robot_list:
-            print(robot)
-        if tour >8:
-            return 0
+        move_Robots(robot_list, graph, what_to_do2)
+        # print("\n",tour)
+        # for robot in robot_list:
+        #     print(robot)
+        # if tour >50:
+        #     return 0
+    print("Pour graphe.txt (aka le graphe du démon) avec méthode: what_to_do2")
     print("Robot tous réveillé en ",tour,"tours.")
     return 0
 
