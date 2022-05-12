@@ -15,7 +15,7 @@ def distance(A: tuple, B: tuple):
 
 def count_robot(lines):
     k = 0
-    while k < len(lines) and (lines[k][0] == 'R' or (lines[k][0] <= '9' and lines[k][0] >= '1')):
+    while k < len(lines) and (lines[k][0] == 'R' or (lines[k][0] <= '9' and lines[k][0] >= '0')):
         k += 1
     return k
 
@@ -28,18 +28,27 @@ def parse_graph_data(text):
         lines = f.readlines()
 
     nb_robot = count_robot(lines)
-    robot_list = [None for k in range(nb_robot)];
+    print(nb_robot)
+    robot_list = [None for k in range(nb_robot)]
 
     k = 0
     while k < nb_robot: # for each robot
         data, line = get_data_from_line(lines[k])
-
+        print(line)
         # to get index for robot_list and id for robot
-        if line[0] == 'R':
-            list_index = 0
-        elif line[0] <= '9' and line[0] >= '1':
-            list_index = int(line[0])
 
+        id = ''
+        for c in line[0]:
+            id += c
+
+        if id == 'R':
+            list_index = 0
+        # elif line[0] <= '9' and line[0] >= '0':
+        #     list_index = int(line[0])
+        else:
+            list_index = int(id)
+
+        print(list_index)
         # to get robot coordinates
         robot_list[list_index] = None
         x = ''
@@ -81,6 +90,6 @@ def parse_graph_data(text):
     return robot_list, graph
 
 if __name__ == "__main__":
-    robot_list, graph = parse_graph_data("graphe.txt")
+    robot_list, graph = parse_graph_data("graphe2.txt")
     print(robot_list)
     print(graph)

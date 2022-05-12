@@ -1,11 +1,11 @@
 import numpy as np
 from text_to_graph import parse_graph_data
 """
-On suppose qu'on a le matrice graph défini comme suit:
-    T[i] est un tableau contenant l'ensemble des sommets reliés à i et l'élement i,j est le poids associé à l'arrete (i,j)
+On suppose qu'on a la matrice graph défini comme suit:
+    graph[i] est un tableau contenant l'ensemble des sommets reliés à i et l'élement i,j est le poids associé à l'arrete (i,j)
 Nous avons également un tableau robot_List qui contient tous les robots (dictionnaires) ainsi que leurs champs:
     - id 
-    - doord (initialisées au coordonées de départs)
+    - coord (initialisées au coordonées de départs)
     - state: asleep, awake, reserved
     - dest l'array des destination dans l'ordre
     - dist l'array des distances entre le robots et sa/ses destination/s
@@ -51,6 +51,12 @@ def ind_min(tab, Y):
             ind = i
     return ind
 
+def ind_robo_id(robot_List, id):
+    for ind in range(len(robot_List)):
+        if robot_List[ind]["id"] == id:
+            return ind
+    return "wrong id"
+
 def dijkstra(i, graph):
     (d, pere) = relacher_init(i, graph)
     Y = [1 for k in range(len(graph))]
@@ -62,33 +68,33 @@ def dijkstra(i, graph):
                 relacher(u, v, d, pere, graph)
     return (d, pere)
 
-def find_Dest(id, id_position, robot_List, test, graph):
-    dist,pere = dijkstra(id_position, graph) # dist = tableau des distances à id et père = tableau des antécedents pour relier à id
+def find_Dest(i, i_position, robot_List, test, graph):
+    dist,pere = dijkstra(i_position, graph) # dist = tableau des distances à id et père = tableau des antécedents pour relier à id
     if test == min:
         test_dist = np.inf
     else:
         test_dist =0
     ind = None
-    for i in range(len(dist)):
-        if test(dist[i], test_dist) and i != id_position and robot_List[i]["state"] == "asleep":
-            test_dist = dist[i]
-            ind = i
+    for k in range(len(dist)):
+        if test(dist[k], test_dist) and k != i_position and robot_List[k]["state"] == "asleep":
+            test_dist = dist[k]
+            ind = k
     if ind != None: 
         first_dest = ind 
         list_dest = [first_dest] # list_dest = chemin à faire pour relier id à sa destination
         list_dist = [dist[first_dest]] # list_dist = list des distances associé à list_dest
-        while pere[first_dest] != id_position:
+        while pere[first_dest] != i_position:
             first_dest = pere[first_dest]
             list_dest.append(first_dest)
             list_dist.append(dist[first_dest])
-        for robot in list_dest: # On réserve tout les robots à reveiller en chemin
-            if robot_List[robot]["state"] == "asleep":
-                robot_List[robot]["state"] = "reserved"
+        for id in list_dest: # On réserve tout les robots à reveiller en chemin
+            if robot_List[id]["state"] == "asleep":
+                robot_List[id]["state"] = "reserved"
         list_dest = list_dest[::-1]
         list_dist = list_dist[::-1]
 
-        robot_List[id]["dest"] = list_dest
-        robot_List[id]["dist"] = list_dist
+        robot_List[i]["dest"] = list_dest
+        robot_List[i]["dist"] = list_dist
 
 
 def what_to_do1(i, robot_List, graph, state ):
@@ -128,16 +134,20 @@ def robots_all_awake(robot_List):
     return 1
 
 def bjr(): 
-    robot_list, graph = parse_graph_data("graphe.txt")
+    robot_list, graph = parse_graph_data("graphe2.txt")
     tour = 1
     #print("graph: ", graph, "\n")
-    print(tour,"\n",robot_list,"\n")
+    print("\n", tour)
+    for robot in robot_list:
+        print(robot)
     find_Dest(0, 0, robot_list, min, graph)
     while not robots_all_awake(robot_list):
         tour +=1
-        move_Robots(robot_list, graph, what_to_do2)
-        print(tour,"\n",robot_list,"\n")
-        if tour >19:
+        move_Robots(robot_list, graph, what_to_do1)
+        print("\n",tour)
+        for robot in robot_list:
+            print(robot)
+        if tour >8:
             return 0
     print("Robot tous réveillé en ",tour,"tours.")
     return 0
