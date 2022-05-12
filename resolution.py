@@ -18,9 +18,9 @@ def max(x,y):
     return x>y
 
 
-def awake(robot_List,i, graph):
+def awake(robot_List,i, graph, test):
     robot_List[i]["state"] = "awake"
-    find_Dest(i, i, robot_List, max, graph)
+    find_Dest(i, i, robot_List, test, graph)
 
 def relacher_init(i,graph):
     d = []
@@ -91,17 +91,35 @@ def find_Dest(id, id_position, robot_List, test, graph):
         robot_List[id]["dist"] = list_dist
 
 
-def move_Robots(robot_List, graph):
+def what_to_do1(i, robot_List, graph, state ):
+    state = min
+    robot = robot_List[i]
+    awake(robot_List, robot["dest"][0],graph, max) # ...on réveille le robot correspondant...
+    id_dest = robot["dest"].pop(0)
+    robot["dist"].pop(0)
+    if len(robot["dest"]) == 0:
+        find_Dest(robot["id"], id_dest, robot_List, state, graph) # ...et on lui assigne sa destination
+
+def what_to_do2(i,robot_List,graph, state):
+    robot = robot_List[i]
+    awake(robot_List, robot["dest"][0],graph, state) # ...on réveille le robot correspondant...
+    id_dest = robot["dest"].pop(0)
+    robot["dist"].pop(0)
+    if len(robot["dest"]) == 0:
+        find_Dest(robot["id"], id_dest, robot_List, min, graph) # ...et on lui assigne sa destination
+
+def move_Robots(robot_List, graph, what_to_do):
+    state = max
     for robot in robot_List:
         if robot["state"] == "awake" and len(robot["dist"]) > 0:
             for k in range(len(robot["dest"])): # On décremente de 1 toutes les distances de "dist"
                 robot["dist"][k] -=1
             if robot["dist"][0] == 0: # Si la plus courte distance tombe à 0... 
-                awake(robot_List, robot["dest"][0],graph) # ...on réveille le robot correspondant...
-                id_dest = robot["dest"].pop(0)
-                robot["dist"].pop(0)
-                if len(robot["dest"]) == 0:
-                    find_Dest(robot["id"], id_dest, robot_List, min, graph) # ...et on lui assigne sa destination
+                what_to_do(robot["id"], robot_List, graph, state)
+                if state == max:
+                    state = min
+                else:
+                    state = max
 
 def robots_all_awake(robot_List):
     for robot in robot_List:
@@ -117,7 +135,7 @@ def bjr():
     find_Dest(0, 0, robot_list, min, graph)
     while not robots_all_awake(robot_list):
         tour +=1
-        move_Robots(robot_list, graph)
+        move_Robots(robot_list, graph, what_to_do2)
         print(tour,"\n",robot_list,"\n")
         if tour >19:
             return 0
