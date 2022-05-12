@@ -60,8 +60,18 @@ def parse_graph_data(text):
     while k < len(lines) and lines[k][0] == 'E':
         line = lines[k].split(' : ')
         data = list(filter(lambda c: c!= '(' and c != ')' and c!= '\n', line[1]))
-        i =  0 if data[0] == 'R' else int(data[0])
-        j =  0 if data[2] == 'R' else int(data[2])
+        beg = True
+        nb1 = ''
+        nb2 = ''
+        for c in data:
+            if c == ',':
+                beg = False
+            elif beg:
+                nb1 += c
+            else:
+                nb2 += c
+        i =  0 if nb1 == 'R' else int(nb1)
+        j =  0 if nb2 == 'R' else int(nb2)
         dist = distance(robot_list[i]["coord"], robot_list[j]["coord"])
         graph[j][i] = ceil(dist) 
         graph[i][j] = ceil(dist)
