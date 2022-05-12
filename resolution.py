@@ -11,18 +11,23 @@ Nous avons également un tableau robot_List qui contient tous les robots (dictio
     - dist l'array des distances entre le robots et sa/ses destination/s
 
 """
+
 def min(x,y):
+    """ Returns a boolean x < y"""
     return x<y
 
 def max(x,y):
+    """ Returns a boolean x > y"""
     return x>y
 
 
 def awake(robot_List,id, graph, test, id_List):
+    """ Awaken 'id' robot and finds it a destination far or close depending of 'state'"""
     robot_List[get_correct_index(id_List,id)]["state"] = "awake"
     find_Dest(id, id, robot_List, test, graph, id_List)
 
 def relacher_init(id,graph, id_List):
+    """ Initialise 'd' and 'pere' array for the dijkstra algorithm"""
     d = []
     pere = []
     for j in range(len(graph)):
@@ -32,17 +37,20 @@ def relacher_init(id,graph, id_List):
     return (d, pere)
 
 def relacher(i_u, i_v, d, pere, graph, id_List):
+    """ Update 'd' and 'pere' values for 'i_v' vertex modified by 'i_u' vertex"""
     if d[i_v] > d[i_u] + graph[i_u][i_v]:
         d[i_v] = d[i_u] + graph[i_u][i_v]
         pere[i_v] = id_List[i_u]
 
 def not_Empty(tab):
+    """ Boolean telling if there is a least one non-zero element in 'tab'"""
     for i in tab:
         if i == 1:
             return 1
     return 0
 
 def ind_min(tab, Y):
+    """ Returns the index of the minimum of 'tab'"""
     ind=0
     min= np.inf
     for i in range(len(tab)):
@@ -51,14 +59,11 @@ def ind_min(tab, Y):
             ind = i
     return ind
 
-def ind_robot_id(robot_List, id):
-    for ind in range(len(robot_List)):
-        if robot_List[ind]["id"] == id:
-            return ind
-    return "wrong id"
-
-def dijkstra(i, graph, id_List):
-    (d, pere) = relacher_init(i, graph, id_List)
+def dijkstra(id, graph, id_List):
+    """ Returns two arrays: \n 
+     - 'd' is the distance to all other vertices starting from 'id' \n
+     - 'pere' indicates the previous vertex to visit to reach'id'"""
+    (d, pere) = relacher_init(id, graph, id_List)
     Y = [1 for k in range(len(graph))]
     while not_Empty(Y):
         u = ind_min(d, Y)
@@ -69,6 +74,7 @@ def dijkstra(i, graph, id_List):
     return (d, pere)
 
 def find_Dest(i, i_position, robot_List, test, graph, id_List):
+    """ Update the field "dest" of 'i' with the array of its destination and "dist" with the corresponding distances """
     dist,pere = dijkstra(i_position, graph, id_List) # dist = tableau des distances à id et père = tableau des antécedents pour relier à id
     print(pere)
     if test == min:
@@ -99,6 +105,8 @@ def find_Dest(i, i_position, robot_List, test, graph, id_List):
 
 
 def what_to_do1(i, robot_List, graph, state, id_List):
+    """ First implementation of the algorithm for wakening the robot\n
+    Strategy: ???"""
     state = min
     robot = robot_List[i]
     awake(robot_List, robot["dest"][0],graph, max, id_List) # ...on réveille le robot correspondant...
@@ -108,6 +116,8 @@ def what_to_do1(i, robot_List, graph, state, id_List):
         find_Dest(robot["id"], id_dest, robot_List, state, graph, id_List) # ...et on lui assigne sa destination
 
 def what_to_do2(i,robot_List,graph, state, id_List):
+    """ Second implementation of the algorithm for wakening the robot\n
+    Strategy: ???"""
     robot = robot_List[i]
     awake(robot_List, robot["dest"][0],graph, state, id_List) # ...on réveille le robot correspondant...
     id_dest = robot["dest"].pop(0)
@@ -116,6 +126,7 @@ def what_to_do2(i,robot_List,graph, state, id_List):
         find_Dest(robot["id"], id_dest, robot_List, min, graph,id_List) # ...et on lui assigne sa destination
 
 def move_Robots(robot_List, graph, what_to_do, id_List):
+    """ Decrease all distances by 1 and, if necessary, wakes up a robot"""
     state = max
     for robot in robot_List:
         if robot["state"] == "awake" and len(robot["dist"]) > 0:
@@ -133,12 +144,14 @@ def move_Robots(robot_List, graph, what_to_do, id_List):
                     robot["dest"].pop(0)
 
 def robots_all_awake(robot_List):
+    """ Checks if it remains at least one robot which is not awake"""
     for robot in robot_List:
         if robot["state"] != "awake":
             return 0
     return 1
 
-def bjr(): 
+def main(): 
+    """ The main function, calling all the others, and printing the amount of turns required to wake all robots"""
     id_List,robot_list, graph = parse_graph_data("petit_graphe.txt")
     # id_List,robot_list, graph = parse_graph_data("graphe_intermediaire.txt")
     # id_List,robot_list, graph = parse_graph_data("graphe_ultime.txt")
@@ -161,4 +174,4 @@ def bjr():
     return 0
 
 if __name__ == "__main__":
-    bjr()
+    main()
