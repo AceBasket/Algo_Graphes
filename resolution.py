@@ -1,16 +1,9 @@
 import numpy as np
 from text_to_graph import parse_graph_data, get_correct_index
-"""
-On suppose qu'on a la matrice graph défini comme suit:
-    graph[i] est un tableau contenant l'ensemble des sommets reliés à i et l'élement i,j est le poids associé à l'arrete (i,j)
-Nous avons également un tableau robot_List qui contient tous les robots (dictionnaires) ainsi que leurs champs:
-    - id 
-    - coord (initialisées au coordonées de départs)
-    - state: asleep, awake, reserved
-    - dest l'array des destination dans l'ordre
-    - dist l'array des distances entre le robots et sa/ses destination/s
 
-"""
+
+""" Utilities"""
+
 
 def min(x,y):
     """ Returns a boolean x < y"""
@@ -19,12 +12,6 @@ def min(x,y):
 def max(x,y):
     """ Returns a boolean x > y"""
     return x>y
-
-
-def awake(robot_List,id, graph, test, id_List):
-    """ Awaken 'id' robot and finds it a destination far or close depending of 'state'"""
-    robot_List[get_correct_index(id_List,id)]["state"] = "awake"
-    find_Dest(id, id, robot_List, test, graph, id_List)
 
 def relacher_init(id,graph, id_List):
     """ Initialise 'd' and 'pere' array for the dijkstra algorithm"""
@@ -72,6 +59,22 @@ def dijkstra(id, graph, id_List):
             if Y[v] == 1 and graph[u][v]!= 0:
                 relacher(u, v, d, pere, graph, id_List)
     return (d, pere)
+
+
+""" Robot functions"""
+
+
+def robots_all_awake(robot_List):
+    """ Checks if it remains at least one robot which is not awake"""
+    for robot in robot_List:
+        if robot["state"] != "awake":
+            return 0
+    return 1
+    
+def awake(robot_List,id, graph, test, id_List):
+    """ Awaken 'id' robot and finds it a destination far or close depending of 'state'"""
+    robot_List[get_correct_index(id_List,id)]["state"] = "awake"
+    find_Dest(id, id, robot_List, test, graph, id_List)
 
 def find_Dest(i, i_position, robot_List, test, graph, id_List):
     """ Update the field "dest" of 'i' with the array of its destination and "dist" with the corresponding distances """
@@ -143,29 +146,35 @@ def move_Robots(robot_List, graph, what_to_do, id_List):
                     robot["dist"].pop(0)
                     robot["dest"].pop(0)
 
-def robots_all_awake(robot_List):
-    """ Checks if it remains at least one robot which is not awake"""
-    for robot in robot_List:
-        if robot["state"] != "awake":
-            return 0
-    return 1
+
+"""
+On suppose que la matrice graph est définie comme suit:
+    graph[i] est un tableau contenant l'ensemble des sommets reliés à i et l'élement i,j est le poids associé à l'arrete (i,j)
+Nous avons également un tableau robot_List qui contient tous les robots (dictionnaires) ainsi que leurs champs:
+    - id 
+    - coord (initialisées au coordonées de départs)
+    - state: asleep, awake, reserved
+    - dest l'array des destination dans l'ordre
+    - dist l'array des distances entre le robots et sa/ses destination/s
+
+"""
 
 def main(): 
     """ The main function, calling all the others, and printing the amount of turns required to wake all robots"""
-    id_List,robot_list, graph = parse_graph_data("petit_graphe.txt")
-    # id_List,robot_list, graph = parse_graph_data("graphe_intermediaire.txt")
-    # id_List,robot_list, graph = parse_graph_data("graphe_ultime.txt")
+    id_List,robot_List, graph = parse_graph_data("petit_graphe.txt")
+    # id_List,robot_List, graph = parse_graph_data("graphe_intermediaire.txt")
+    # id_List,robot_List, graph = parse_graph_data("graphe_ultime.txt")
     tour = 1
     print("id: ", id_List, "\n")
     print("\n", tour)
-    for robot in robot_list:
+    for robot in robot_List:
         print(robot)
-    find_Dest(0, 0, robot_list, min, graph, id_List)
-    while not robots_all_awake(robot_list):
+    find_Dest(0, 0, robot_List, min, graph, id_List)
+    while not robots_all_awake(robot_List):
         tour +=1
-        move_Robots(robot_list, graph, what_to_do1, id_List)
+        move_Robots(robot_List, graph, what_to_do1, id_List)
         print("\n",tour)
-        for robot in robot_list:
+        for robot in robot_List:
             print(robot)
         # if tour >2:
         #     return 0
