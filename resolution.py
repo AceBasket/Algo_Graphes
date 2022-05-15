@@ -74,12 +74,13 @@ def robots_all_awake(robot_List):
 def awake(robot_List,id, graph, test, id_List):
     """ Awaken 'id' robot and finds it a destination far or close depending of 'state'"""
     robot_List[get_correct_index(id_List,id)]["state"] = "awake"
+    robot_List[get_correct_index(id_List,id)]["range"] = test.__name__
     find_Dest(id, id, robot_List, test, graph, id_List)
 
 def find_Dest(i, i_position, robot_List, test, graph, id_List):
     """ Update the field "dest" of 'i' with the array of its destination and "dist" with the corresponding distances """
     dist,pere = dijkstra(i_position, graph, id_List) # dist = tableau des distances à id et père = tableau des antécedents pour relier à id
-    print(pere)
+    #print(pere)
     if test == min:
         test_dist = np.inf
     else:
@@ -107,26 +108,31 @@ def find_Dest(i, i_position, robot_List, test, graph, id_List):
         robot_List[i]["dist"] = list_dist
 
 
-def what_to_do1(i, robot_List, graph, state, id_List):
+def what_to_do1(i, robot_List, graph, id_List):
     """ First implementation of the algorithm for wakening the robot\n
     Strategy: ???"""
-    state = min
     robot = robot_List[i]
-    awake(robot_List, robot["dest"][0],graph, max, id_List) # ...on réveille le robot correspondant...
-    id_dest = robot["dest"].pop(0)
-    robot["dist"].pop(0)
-    if len(robot["dest"]) == 0:
-        find_Dest(robot["id"], id_dest, robot_List, state, graph, id_List) # ...et on lui assigne sa destination
-
-def what_to_do2(i,robot_List,graph, state, id_List):
-    """ Second implementation of the algorithm for wakening the robot\n
-    Strategy: ???"""
-    robot = robot_List[i]
+    if robot["range"] == "min":
+        state = max
+        state_i = min
+    else:
+        state = min
+        state_i = max
     awake(robot_List, robot["dest"][0],graph, state, id_List) # ...on réveille le robot correspondant...
     id_dest = robot["dest"].pop(0)
     robot["dist"].pop(0)
     if len(robot["dest"]) == 0:
-        find_Dest(robot["id"], id_dest, robot_List, min, graph,id_List) # ...et on lui assigne sa destination
+        find_Dest(robot["id"], id_dest, robot_List, state_i, graph, id_List) # ...et on lui assigne sa destination
+
+def what_to_do2(i,robot_List,graph, id_List):
+    """ Second implementation of the algorithm for wakening the robot\n
+    Strategy: ???"""
+    robot = robot_List[i]
+    awake(robot_List, robot["dest"][0],graph, id_List) # ...on réveille le robot correspondant...
+    id_dest = robot["dest"].pop(0)
+    robot["dist"].pop(0)
+    if len(robot["dest"]) == 0:
+        find_Dest(robot["id"], id_dest, robot_List, graph,id_List) # ...et on lui assigne sa destination
 
 def move_Robots(robot_List, graph, what_to_do, id_List):
     """ Decrease all distances by 1 and, if necessary, wakes up a robot"""
@@ -135,16 +141,13 @@ def move_Robots(robot_List, graph, what_to_do, id_List):
         if robot["state"] == "awake" and len(robot["dist"]) > 0:
             for k in range(len(robot["dest"])): # On décremente de 1 toutes les distances de "dist"
                 robot["dist"][k] -=1
-            if robot["dist"][0] == 0:
-                if robot_List[get_correct_index(id_List, robot["dest"][0])]["state"] != "awake": # Si la plus courte distance tombe à 0... 
-                    what_to_do(robot["id"], robot_List, graph, state, id_List)
-                    if state == max:
-                        state = min
-                    else:
-                        state = max
-                else:
-                    robot["dist"].pop(0)
-                    robot["dest"].pop(0)
+    for robot in robot_List:
+        if len(robot["dist"]) >0 and robot["dist"][0] == 0:
+            if robot_List[get_correct_index(id_List, robot["dest"][0])]["state"] != "awake": # Si la plus courte distance tombe à 0... 
+                what_to_do(robot["id"], robot_List, graph, id_List)
+            else:
+                robot["dist"].pop(0)
+                robot["dest"].pop(0)
 
 
 """
@@ -156,14 +159,15 @@ Nous avons également un tableau robot_List qui contient tous les robots (dictio
     - state: asleep, awake, reserved
     - dest l'array des destination dans l'ordre
     - dist l'array des distances entre le robots et sa/ses destination/s
+    - range le paramètre dictant la strat"gie du robot
 
 """
 
 def main(): 
     """ The main function, calling all the others, and printing the amount of turns required to wake all robots"""
-    id_List,robot_List, graph = parse_graph_data("petit_graphe.txt")
+    # id_List,robot_List, graph = parse_graph_data("petit_graphe.txt")
     # id_List,robot_List, graph = parse_graph_data("graphe_intermediaire.txt")
-    # id_List,robot_List, graph = parse_graph_data("graphe_ultime.txt")
+    id_List,robot_List, graph = parse_graph_data("graphe_ultime.txt")
     tour = 1
     print("id: ", id_List, "\n")
     print("\n", tour)
@@ -173,9 +177,10 @@ def main():
     while not robots_all_awake(robot_List):
         tour +=1
         move_Robots(robot_List, graph, what_to_do1, id_List)
-        print("\n",tour)
-        for robot in robot_List:
-            print(robot)
+        if tour <15:
+            print("\n",tour)
+            for robot in robot_List:
+                print(robot)
         # if tour >2:
         #     return 0
     print("Pour graphe.txt (aka le graphe du démon) avec méthode: what_to_do1")

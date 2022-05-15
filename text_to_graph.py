@@ -58,7 +58,7 @@ def parse_graph_data(text):
                 y += c
             else:
                 robot_list[i] = 0 # so that robot isn't none
-        robot_list[i] = {"dist": [], "coord": (int(x),int(y)), "dest": [], "state": "awake" if i == 0 else "asleep", "id": list_index}
+        robot_list[i] = {"dist": [], "coord": (int(x),int(y)), "dest": [], "state": "awake" if i == 0 else "asleep","range": None if i!=0 else "min" ,"id": list_index}
         k += 1
 
 
