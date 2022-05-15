@@ -1,6 +1,6 @@
 import numpy as np
 from text_to_graph import parse_graph_data, get_correct_index
-
+from rendering_graph import rendering
 
 """ Utilities"""
 
@@ -165,18 +165,20 @@ Nous avons également un tableau robot_List qui contient tous les robots (dictio
 
 def main(): 
     """ The main function, calling all the others, and printing the amount of turns required to wake all robots"""
-    # id_List,robot_List, graph = parse_graph_data("petit_graphe.txt")
+    id_List,robot_List, graph = parse_graph_data("petit_graphe.txt")
     # id_List,robot_List, graph = parse_graph_data("graphe_intermediaire.txt")
-    id_List,robot_List, graph = parse_graph_data("graphe_ultime.txt")
+    # id_List,robot_List, graph = parse_graph_data("graphe_ultime.txt")
     tour = 1
     print("id: ", id_List, "\n")
     print("\n", tour)
     for robot in robot_List:
         print(robot)
     find_Dest(0, 0, robot_List, min, graph, id_List)
+    rendering(id_List, robot_List, graph, tour)
     while not robots_all_awake(robot_List):
         tour +=1
         move_Robots(robot_List, graph, what_to_do1, id_List)
+        rendering(id_List, robot_List, graph, tour)
         if tour <15:
             print("\n",tour)
             for robot in robot_List:

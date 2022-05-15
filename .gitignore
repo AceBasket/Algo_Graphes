@@ -130,3 +130,6 @@ dmypy.json
 
 doctest-output
 *.png
+svgasm
+*.dot
+*.gif
