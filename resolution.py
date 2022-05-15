@@ -84,20 +84,26 @@ def find_Dest(i, i_position, robot_List, test, graph, id_List):
     if test == min:
         test_dist = np.inf
     else:
-        test_dist =0
+        test_dist = 0
     ind = None
     for k in range(len(dist)):
-        if test(dist[k], test_dist) and k != i_position and robot_List[k]["state"] == "asleep":
+        if test(dist[k], test_dist) and k != i_position and (robot_List[k]["state"] == "asleep" or (robot_List[k]["state"] == "reserved" and test(dist[k], robot_List[k]["dist"][0]))):
             test_dist = dist[k]
             ind = k
+        
     if ind != None: 
-        first_dest = id_List[ind] 
+        first_dest = id_List[ind]
         list_dest = [first_dest] # list_dest = chemin à faire pour relier id à sa destination
-        list_dist = [dist[get_correct_index(id_List, first_dest)]] # list_dist = list des distances associé à list_dest
+        list_dist = [dist[get_correct_index(id_List, first_dest)]] # list_dist = liste des distances associées à list_dest
+        robot_List[get_correct_index(id_List, first_dest)]["dest"] = i
+        robot_List[get_correct_index(id_List, first_dest)]["dist"] = list_dist[-1]
         while pere[get_correct_index(id_List,first_dest)] != id_List[i_position]:
             first_dest = pere[get_correct_index(id_List,first_dest)]
             list_dest.append(first_dest)
             list_dist.append(dist[get_correct_index(id_List,first_dest)])
+            robot_List[get_correct_index(id_List, first_dest)]["dest"] = i
+            robot_List[get_correct_index(id_List, first_dest)]["dist"] = list_dist[-1]
+
         for id in list_dest: # On réserve tout les robots à reveiller en chemin
             if robot_List[get_correct_index(id_List,id)]["state"] == "asleep":
                 robot_List[get_correct_index(id_List,id)]["state"] = "reserved"
@@ -138,12 +144,12 @@ def move_Robots(robot_List, graph, what_to_do, id_List):
     """ Decrease all distances by 1 and, if necessary, wakes up a robot"""
     state = max
     for robot in robot_List:
-        if robot["state"] == "awake" and len(robot["dist"]) > 0:
+        if robot["state"] != "asleep" and len(robot["dist"]) > 0:
             for k in range(len(robot["dest"])): # On décremente de 1 toutes les distances de "dist"
                 robot["dist"][k] -=1
     for robot in robot_List:
-        if len(robot["dist"]) >0 and robot["dist"][0] == 0:
-            if robot_List[get_correct_index(id_List, robot["dest"][0])]["state"] != "awake": # Si la plus courte distance tombe à 0... 
+        if len(robot["dist"]) >0 and robot["dist"][0] == 0 and robot["state"] == "awake": # Si la plus courte distance tombe à 0... 
+            if robot_List[get_correct_index(id_List, robot["dest"][0])]["state"] != "awake": # Si le robot atteint n'est pas encore réveillé
                 what_to_do(robot["id"], robot_List, graph, id_List)
             else:
                 robot["dist"].pop(0)
