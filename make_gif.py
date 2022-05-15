@@ -11,7 +11,7 @@ def create_gif_from_pngs(folder):
             continue
         images.append(iio.imread(file))
 
-    iio.mimwrite(gif_file, images, format=".gif", fps=1)
+    iio.mimwrite(gif_file, images, format=".gif", fps=3)
 
 if __name__ == "__main__":
     create_gif_from_pngs("png")

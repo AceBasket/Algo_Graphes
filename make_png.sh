@@ -4,6 +4,7 @@ dot_files=$(find -name "graphe[1-9]*.dot")
 
 for file in $dot_files
     do
+        echo $file
         id=$(echo $file | cut -d "e" -f 2 | cut -d "." -f 1)
         if [ $id -lt 10 ];
         then
