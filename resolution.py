@@ -1,6 +1,6 @@
 import numpy as np
 from text_to_graph import parse_graph_data, get_correct_index
-
+from rendering_graph import rendering
 
 """ Utilities"""
 
@@ -226,10 +226,12 @@ def main():
     for robot in robot_List:
         print(robot)
     find_Dest(0, 0, robot_List, min, graph, id_List)
+    # rendering(id_List, robot_List, graph, tour)
     while not robots_all_awake(robot_List):
         tour +=1
         move_Robots(robot_List, graph, what_to_do1, id_List)
-        if tour <200:
+        # rendering(id_List, robot_List, graph, tour)
+        if tour <100:
             print("\n",tour)
             for robot in robot_List:
                 print(robot)
