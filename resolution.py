@@ -219,6 +219,7 @@ Nous avons également un tableau robot_List qui contient tous les robots (dictio
 def main(): 
     """ The main function, calling all the others, and printing the amount of turns required to wake all robots"""
     id_List,robot_List, graph = parse_graph_data(sys.argv[1])
+    rendering(id_List, robot_List, graph, 0)
     tour = 1
     print("id: ", id_List, "\n")
     print("\n", tour)
