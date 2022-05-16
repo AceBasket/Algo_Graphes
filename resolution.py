@@ -93,8 +93,7 @@ def awake(robot_List,id, graph, test, id_List):
 
 def find_Dest_old(i, i_position, robot_List, test, graph, id_List):
     """ Update the field "dest" of 'i' with the array of its destination and "dist" with the corresponding distances """
-    dist,pere = dijkstra(i_position, graph, id_List) # dist = tableau des distances à id et père = tableau des antécedents pour relier à id
-    #print(pere)
+    dist,pere = dijkstra(i_position, graph, id_List) # dist = array of the distance to "id" , "pere" = array of ancestors to join "id"
     if test == min:
         test_dist = np.inf
     else:
@@ -107,8 +106,8 @@ def find_Dest_old(i, i_position, robot_List, test, graph, id_List):
         
     if ind != None: 
         first_dest = id_List[ind]
-        list_dest = [first_dest] # list_dest = chemin à faire pour relier id à sa destination
-        list_dist = [dist[get_correct_index(id_List, first_dest)]] # list_dist = liste des distances associées à list_dest
+        list_dest = [first_dest] # list_dest = road to follow to link "id" and the destination
+        list_dist = [dist[get_correct_index(id_List, first_dest)]] # list_dist = list of the distance in relation with list_dest
 
         while pere[get_correct_index(id_List,first_dest)] != id_List[i_position]:
             first_dest = pere[get_correct_index(id_List,first_dest)]
