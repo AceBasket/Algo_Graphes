@@ -71,11 +71,12 @@ def robots_all_awake(robot_List):
         if robot["state"] != "awake":
             return 0
     return 1
-    
-def awake1(robot_List,id, graph, id_List):
-    """ Wakes up 'id' robot and finds a destination far from him"""
+
+def awake1(robot_List,id, graph, test, id_List):
+    """ Wakes up 'id' robot and finds a destination far or close depending of 'test'"""
     robot_List[get_correct_index(id_List,id)]["state"] = "awake"
-    find_dest1(id, id, robot_List, max, graph, id_List) # searchs robots to wake up
+    robot_List[get_correct_index(id_List,id)]["range"] = test.__name__ # sets if this robot will look for close or far robots
+    find_dest1(id, id, robot_List, test, graph, id_List)  # searchs robots to wake up
 
 def awake_opti(robot_List,id, graph, test, id_List):
     """ Wakes up 'id' robot, resets his arrays 'dest' and 'dist', and finds a destination far or close depending of 'test' """
@@ -121,7 +122,7 @@ def find_dest1(i, i_position, robot_List, test, graph, id_List):
 def reservation(robot_List, id_List, first_dest, i, list_dist):
     """ If the robot 'first_dest' is asleep : set the id of the robot that will wake him up (= i)
         If the robot 'first_dest' is reserved : change the reservation and erase it from the previous robot that had reserved him """
-    if robot_List[get_correct_index(id_List, first_dest)]["state"] == "reserved":
+    if robot_List[get_correct_index(id_List, first_dest)]["state"] == "reserved" and list_dist[-1] < robot_List[get_correct_index(id_List, first_dest)]["dist"]:
         old_robot_id = robot_List[get_correct_index(id_List, first_dest)]["dest"][0] # id of the previous robot that had reserved the robot "first_dest"
         old_robot_res = len(robot_List[get_correct_index(id_List, old_robot_id)]["dest"]) # number of reservations that have the robot "old_robot"
         old_robot_obj = robot_List[get_correct_index(id_List, old_robot_id)]["dest"][old_robot_res-1] # final objective of the robot "old_robot"
@@ -175,23 +176,28 @@ def find_dest_opti(i, i_position, robot_List, test, graph, id_List):
         robot_List[i]["dest"] = list_dest
         robot_List[i]["dist"] = list_dist
 
-def what_to_do1(i,robot_List,graph, id_List):
+def what_to_do1(i, robot_List, graph, id_List):
     """ First implementation of the algorithm for wakening the robot\n
     Strategy: The first robot will wake up the closest sleeping robot, which will wake up the farthest sleeping robot.
-    Each time a robot is awakened by another robot, it will go for the farthest sleeping robot whereas the other robot will go for the closest.
-    When a robot go for waking up another robot, he will wake up all the sleeping robot on his way. All the robots he plans to wake up are reserved."""
+    the robot has a field (defined when awakened) that define if he looks for the closest or the farthest sleeping robot.
+    When a robot that awake close robot wake up a robot, this robot will look for the farthest robot, and vice versa. The first awake robot will look for the closest.
+    When a robot is going to wake up another robot, he will wake up all the sleeping robot on his way. All the robots he plans to wake up are reserved."""
     robot = robot_List[i]
-    awake1(robot_List, robot["dest"][0],graph, id_List) # wakes up the corresponding robot...
-    id_dest = robot["dest"].pop(0)  # ... erases him from the destinations...
+    if robot["range"] == "min":
+        state = max
+        state_i = min
+    else:
+        state = min
+        state_i = max
+    awake1(robot_List, robot["dest"][0],graph, state, id_List) # wakes up the corresponding robot...
+    id_dest = robot["dest"].pop(0) # ... erases him from the destinations...
     robot["dist"].pop(0) # ... erases also the distance...
     if len(robot["dest"]) == 0:
-        find_dest1(robot["id"], id_dest, robot_List, min, graph,id_List) # ... and gives him a destination
+        find_dest1(robot["id"], id_dest, robot_List, state_i, graph, id_List) # ... and gives him a destination
 
 def what_to_do_opti(i, robot_List, graph, id_List):
     """ Optimization of the previous algorithm\n
-    Strategy: Now, the robot has a field (defined when awakened) that define if he looks for the closest or the farthest sleeping robot.
-    When a robot that awake close robot wake up a robot, this robot will look for the farthest robot, and The first awake robot will look for the closest.
-    Moreover, when a robot is looking for a robot to wake up, he can take a reserved robot if he is closer to this robot
+    Strategy: Now, when a robot is looking for a robot to wake up, he can take a reserved robot if he is closer to this robot
     than the robot that had reserved him."""
     robot = robot_List[i]
     if robot["range"] == "min":
@@ -205,7 +211,6 @@ def what_to_do_opti(i, robot_List, graph, id_List):
     robot["dist"].pop(0) # ... erases also the distance...
     if len(robot["dest"]) == 0:
         find_dest_opti(robot["id"], id_dest, robot_List, state_i, graph, id_List) # ... and gives him a destination
-
 
 def move_Robots(robot_List, graph, what_to_do, id_List):
     """ Decreases all distances by 1 and, if necessary, wakes up a robot"""
@@ -237,23 +242,23 @@ We also have a robot_List array which contains all the robots (dictionaries) alo
 def main(text_graph): 
     """ The main function, calling all the others, and printing the amount of turns required to wake all robots"""
     id_List,robot_List, graph = parse_graph_data(text_graph)
-    rendering(id_List, robot_List, graph, 0)
+    # rendering(id_List, robot_List, graph, 0)
     tour = 1
-    # print("id: ", id_List, "\n")
-    # print("\n", tour)
-    # for robot in robot_List:
-    #     print(robot)
+    print("id: ", id_List, "\n")
+    print("\n", tour)
+    for robot in robot_List:
+        print(robot)
     find_dest_opti(0, 0, robot_List, min, graph, id_List)
-    rendering(id_List, robot_List, graph, tour)
+    # rendering(id_List, robot_List, graph, tour)
     while not robots_all_awake(robot_List):
         tour +=1
         move_Robots(robot_List, graph, what_to_do_opti, id_List)
-        rendering(id_List, robot_List, graph, tour)
-        # if tour <100:
-        #     print("\n",tour)
-        #     for robot in robot_List:
-        #         print(robot)
-    # print("Robot tous réveillé en ",tour,"tours.")
+        # rendering(id_List, robot_List, graph, tour)
+        if tour <100:
+            print("\n",tour)
+            for robot in robot_List:
+                print(robot)
+    print("Robot tous réveillés en ",tour,"tours.")
     return tour
 
 if __name__ == "__main__":
