@@ -9,6 +9,7 @@ def is_in(list, X):
 def generate_world(K, N):
     list_robots = []
     i = 0
+    print(N)
     while i < K :
         x = randint(1, N)
         y = randint(1, N)
@@ -29,5 +30,31 @@ def generate_txt_file(K, N):
     list_edges, list_robots = generate_world(K, N)
     with open("random_graph.txt", 'w') as f:
         for i in range(len(list_robots)):
-            line
+            line = ''
+            if i == 0:
+                line += 'R'
+            else:
+                line += "\n" + str(i)
+            line += " : (" + str(list_robots[i][0]) + "," + str(list_robots[i][1]) + ")"
+            f.write(line)
 
+        for i in range(len(list_edges)):
+            line = "\nE : (" 
+            v1 = list_edges[i][0]
+            v2 = list_edges[i][1]
+            if v1 == 0:
+                line += 'R'
+            else:
+                line += str(v1) 
+            line += "," 
+
+            if v2 == 0:
+                line += 'R'
+            else:
+                line += str(v2) 
+            line += ")"
+            f.write(line)
+
+
+if "__main__" == __name__:
+    generate_txt_file(10, 100)
