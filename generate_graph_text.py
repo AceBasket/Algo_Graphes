@@ -9,7 +9,6 @@ def is_in(list, X):
 def generate_world(K, N):
     list_robots = []
     i = 0
-    print(N)
     while i < K :
         x = randint(1, N)
         y = randint(1, N)
