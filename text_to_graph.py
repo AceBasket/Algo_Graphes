@@ -90,7 +90,7 @@ def parse_graph_data(text):
     return list_ids, robot_list, graph
 
 if __name__ == "__main__":
-    list_ids, robot_list, graph = parse_graph_data("graphe2.txt")
+    list_ids, robot_list, graph = parse_graph_data("graphe_intermediaire.txt")
     print(list_ids)
     print(robot_list)
     print(graph)

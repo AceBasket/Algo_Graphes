@@ -133,3 +133,4 @@ doctest-output
 svgasm
 *.dot
 *.gif
+.vscode

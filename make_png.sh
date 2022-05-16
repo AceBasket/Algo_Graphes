@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dot_files=$(find -name "graphe[1-9]*.dot")
+dot_files=$(find -name "graphe[0-9]*.dot")
 
 for file in $dot_files
     do
