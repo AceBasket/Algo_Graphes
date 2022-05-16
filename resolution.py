@@ -108,7 +108,7 @@ def find_dest1(i, i_position, robot_List, test, graph, id_List):
             list_dest.append(first_dest)
             list_dist.append(dist[get_correct_index(id_List,first_dest)])
 
-        for id in list_dest: # On réserve tout les robots à reveiller en chemin
+        for id in list_dest: # Reservation of all robots on the way
             if robot_List[get_correct_index(id_List,id)]["state"] == "asleep":
                 robot_List[get_correct_index(id_List,id)]["state"] = "reserved"
         list_dest = list_dest[::-1]
@@ -122,14 +122,14 @@ def reservation(robot_List, id_List, first_dest, i, list_dist):
     """ If the robot 'first_dest' is asleep : set the id of the robot that will wake him up (= i)
         If the robot 'first_dest' is reserved : change the reservation and erase it from the previous robot that had reserved him """
     if robot_List[get_correct_index(id_List, first_dest)]["state"] == "reserved":
-        old_robot_id = robot_List[get_correct_index(id_List, first_dest)]["dest"][0] # id du précédent robot à l'avoir réservé
-        old_robot_res = len(robot_List[get_correct_index(id_List, old_robot_id)]["dest"]) # nombre de réservations de ce robot
-        old_robot_obj = robot_List[get_correct_index(id_List, old_robot_id)]["dest"][old_robot_res-1] # objectif final de ce robot
+        old_robot_id = robot_List[get_correct_index(id_List, first_dest)]["dest"][0] # id of the previous robot that had reserved the robot "first_dest"
+        old_robot_res = len(robot_List[get_correct_index(id_List, old_robot_id)]["dest"]) # number of reservations that have the robot "old_robot"
+        old_robot_obj = robot_List[get_correct_index(id_List, old_robot_id)]["dest"][old_robot_res-1] # final objective of the robot "old_robot"
 
-        robot_List[get_correct_index(id_List, first_dest)]["dest"] = [i] # change le robot qui a réservé...
-        robot_List[get_correct_index(id_List, first_dest)]["dist"] = [list_dist[-1]] # ... et la distance associée
+        robot_List[get_correct_index(id_List, first_dest)]["dest"] = [i] # change the robot that reserve him...
+        robot_List[get_correct_index(id_List, first_dest)]["dist"] = [list_dist[-1]] # ... and the distance associated
 
-        # Tant que l'objectif final du précédent robot n'est pas valide, l'enlever jusqu'à ce qu'il soit valide ou qu'il n'en reste qu'un
+        # While the final objective of the "old_robot" isn't valid, take it off his road until it's get valid or only one destination remains
         while old_robot_res > 1 and (robot_List[get_correct_index(id_List, old_robot_obj)]["state"] == "awake" or robot_List[get_correct_index(id_List, old_robot_obj)]["dest"][0] != old_robot_id):
             robot_List[get_correct_index(id_List, old_robot_id)]["dest"].pop(old_robot_res-1)
             robot_List[get_correct_index(id_List, old_robot_id)]["dist"].pop(old_robot_res-1)
@@ -142,8 +142,7 @@ def reservation(robot_List, id_List, first_dest, i, list_dist):
 
 def find_dest_opti(i, i_position, robot_List, test, graph, id_List):
     """ Update the field "dest" of 'i' with the array of its destination and "dist" with the corresponding distances """
-    dist,pere = dijkstra(i_position, graph, id_List) # dist = tableau des distances à id et père = tableau des antécedents pour relier à id
-    #print(pere)
+    dist,pere = dijkstra(i_position, graph, id_List) # dist = array of the distance to "id" , "pere" = array of ancestors to join "id"
     if test == min:
         test_dist = np.inf
     else:
@@ -156,8 +155,8 @@ def find_dest_opti(i, i_position, robot_List, test, graph, id_List):
         
     if ind != None: 
         first_dest = id_List[ind]
-        list_dest = [first_dest] # list_dest = chemin à faire pour relier id à sa destination
-        list_dist = [dist[get_correct_index(id_List, first_dest)]] # list_dist = liste des distances associées à list_dest
+        list_dest = [first_dest] # list_dest = road to follow to link "id" and the destination
+        list_dist = [dist[get_correct_index(id_List, first_dest)]] # list_dist = list of the distance in relation with list_dest
         reservation(robot_List, id_List, first_dest, i, list_dist)
 
         while pere[get_correct_index(id_List,first_dest)] != id_List[i_position]:
@@ -166,7 +165,7 @@ def find_dest_opti(i, i_position, robot_List, test, graph, id_List):
             list_dist.append(dist[get_correct_index(id_List,first_dest)])
             reservation(robot_List, id_List, first_dest, i, list_dist)
 
-        for id in list_dest: # On réserve tout les robots à reveiller en chemin
+        for id in list_dest: # Reservation of all robots on the way
             if robot_List[get_correct_index(id_List,id)]["state"] == "asleep":
                 robot_List[get_correct_index(id_List,id)]["state"] = "reserved"
         list_dest = list_dest[::-1]
@@ -181,11 +180,11 @@ def what_to_do1(i,robot_List,graph, id_List):
     Each time a robot is awakened by another robot, it will go for the farthest sleeping robot whereas the other robot will go for the closest.
     When a robot go for waking up another robot, he will wake up all the sleeping robot on his way. All the robots he plans to wake up are reserved."""
     robot = robot_List[i]
-    awake1(robot_List, robot["dest"][0],graph, id_List) # ...on réveille le robot correspondant...
+    awake1(robot_List, robot["dest"][0],graph, id_List) # Wake up the corresponding robot...
     id_dest = robot["dest"].pop(0)
     robot["dist"].pop(0)
     if len(robot["dest"]) == 0:
-        find_dest1(robot["id"], id_dest, robot_List, min, graph,id_List) # ...et on lui assigne sa destination
+        find_dest1(robot["id"], id_dest, robot_List, min, graph,id_List) # ... and give him a destination
 
 def what_to_do_opti(i, robot_List, graph, id_List):
     """ Optimization of the previous algorithm\n
@@ -200,22 +199,22 @@ def what_to_do_opti(i, robot_List, graph, id_List):
     else:
         state = min
         state_i = max
-    awake_opti(robot_List, robot["dest"][0],graph, state, id_List) # ...on réveille le robot correspondant...
+    awake_opti(robot_List, robot["dest"][0],graph, state, id_List) # Wake up the corresponding robot...
     id_dest = robot["dest"].pop(0)
     robot["dist"].pop(0)
     if len(robot["dest"]) == 0:
-        find_dest_opti(robot["id"], id_dest, robot_List, state_i, graph, id_List) # ...et on lui assigne sa destination
+        find_dest_opti(robot["id"], id_dest, robot_List, state_i, graph, id_List) # ... and give him a destination
 
 
 def move_Robots(robot_List, graph, what_to_do, id_List):
     """ Decrease all distances by 1 and, if necessary, wakes up a robot"""
     for robot in robot_List:
         if robot["state"] != "asleep" and len(robot["dist"]) > 0:
-            for k in range(len(robot["dest"])): # On décremente de 1 toutes les distances de "dist"
+            for k in range(len(robot["dest"])): # Decrease by 1 all the distance of "dist"
                 robot["dist"][k] -=1
     for robot in robot_List:
-        if len(robot["dist"]) >0 and robot["dist"][0] == 0 and robot["state"] == "awake": # Si la plus courte distance tombe à 0... 
-            if robot_List[get_correct_index(id_List, robot["dest"][0])]["state"] != "awake": # Si le robot atteint n'est pas encore réveillé
+        if len(robot["dist"]) >0 and robot["dist"][0] == 0 and robot["state"] == "awake": # If the smallest distance is 0...
+            if robot_List[get_correct_index(id_List, robot["dest"][0])]["state"] != "awake": # If the robot reached isn't awake
                 what_to_do(robot["id"], robot_List, graph, id_List)
             else:
                 robot["dist"].pop(0)
@@ -223,16 +222,15 @@ def move_Robots(robot_List, graph, what_to_do, id_List):
 
 
 """
-On suppose que la matrice graph est définie comme suit:
-    graph[i] est un tableau contenant l'ensemble des sommets reliés à i et l'élement i,j est le poids associé à l'arrete (i,j)
-Nous avons également un tableau robot_List qui contient tous les robots (dictionnaires) ainsi que leurs champs:
-    - id 
-    - coord (initialisées au coordonées de départs)
-    - state: asleep, awake, reserved
-    - dest l'array des destination dans l'ordre
-    - dist l'array des distances entre le robots et sa/ses destination/s
-    - range le paramètre dictant la strat"gie du robot
-
+We assume that the matrix graph is defined as follows:
+     graph[i] is an array containing all the vertices linked to i and the element i,j is the weight associated with the edge (i,j)
+We also have a robot_List array which contains all the robots (dictionaries) along with their fields:
+     - "id"
+     - "coord" (initialized at the start coordinates)
+     - "state": asleep, awake, reserved
+     - "dest" the array of destinations in order
+     - "dist" the array of distances between the robot and its destination(s)
+     - "range" the parameter dictating the strategy of the robot
 """
 
 def main(text_graph): 
@@ -254,9 +252,6 @@ def main(text_graph):
         #     print("\n",tour)
         #     for robot in robot_List:
         #         print(robot)
-        # if tour >2:
-        #     return 0
-    # print("Pour graphe.txt (aka le graphe du démon) avec méthode: what_to_do1")
     # print("Robot tous réveillé en ",tour,"tours.")
     return tour
 
