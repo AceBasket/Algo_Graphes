@@ -132,8 +132,8 @@ def reservation(robot_List, id_List, first_dest, i, list_dist):
 
         # While the final objective of the "old_robot" isn't valid, take it off his road until it's get valid or only one destination remains
         while old_robot_res > 1 and (robot_List[get_correct_index(id_List, old_robot_obj)]["state"] == "awake" or robot_List[get_correct_index(id_List, old_robot_obj)]["dest"][0] != old_robot_id):
-            robot_List[get_correct_index(id_List, old_robot_id)]["dest"].pop(old_robot_res-1)
-            robot_List[get_correct_index(id_List, old_robot_id)]["dist"].pop(old_robot_res-1)
+            robot_List[get_correct_index(id_List, old_robot_id)]["dest"].pop()
+            robot_List[get_correct_index(id_List, old_robot_id)]["dist"].pop()
             old_robot_res = old_robot_res - 1
             old_robot_obj = robot_List[get_correct_index(id_List, old_robot_id)]["dest"][old_robot_res-1]
 
@@ -244,21 +244,21 @@ def main(text_graph):
     id_List,robot_List, graph = parse_graph_data(text_graph)
     # rendering(id_List, robot_List, graph, 0)
     tour = 1
-    print("id: ", id_List, "\n")
-    print("\n", tour)
-    for robot in robot_List:
-        print(robot)
+    # print("id: ", id_List, "\n")
+    # print("\n", tour)
+    # for robot in robot_List:
+    #     print(robot)
     find_dest_opti(0, 0, robot_List, min, graph, id_List)
     # rendering(id_List, robot_List, graph, tour)
     while not robots_all_awake(robot_List):
         tour +=1
         move_Robots(robot_List, graph, what_to_do_opti, id_List)
         # rendering(id_List, robot_List, graph, tour)
-        if tour <100:
-            print("\n",tour)
-            for robot in robot_List:
-                print(robot)
-    print("Robot tous réveillés en ",tour,"tours.")
+        # if tour <100:
+        #     print("\n",tour)
+        #     for robot in robot_List:
+        #         print(robot)
+    print("Robots tous réveillés en ",tour,"tours.")
     return tour
 
 if __name__ == "__main__":
