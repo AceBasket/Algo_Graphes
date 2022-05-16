@@ -72,10 +72,16 @@ def robots_all_awake(robot_List):
             return 0
     return 1
     
-def awake_old(robot_List,id, graph, id_List):
+def awake_very_old(robot_List,id, graph, id_List):
     """ Awaken 'id' robot and finds it a destination far or close depending of 'state'"""
     robot_List[get_correct_index(id_List,id)]["state"] = "awake"
     find_Dest_old(id, id, robot_List, max, graph, id_List)
+
+def awake_old(robot_List,id, graph, test, id_List):
+    """ Awaken 'id' robot and finds it a destination far or close depending of 'state'"""
+    robot_List[get_correct_index(id_List,id)]["state"] = "awake"
+    robot_List[get_correct_index(id_List,id)]["range"] = test.__name__
+    find_Dest_old(id, id, robot_List, test, graph, id_List)
 
 def awake(robot_List,id, graph, test, id_List):
     """ Awaken 'id' robot and finds it a destination far or close depending of 'state'"""
@@ -193,11 +199,27 @@ def what_to_do1(i, robot_List, graph, id_List):
     if len(robot["dest"]) == 0:
         find_Dest(robot["id"], id_dest, robot_List, state_i, graph, id_List) # ...et on lui assigne sa destination
 
-def what_to_do2(i,robot_List,graph, id_List):
+def what_to_do2(i, robot_List, graph, id_List):
+    """ First implementation of the algorithm for wakening the robot\n
+    Strategy: ???"""
+    robot = robot_List[i]
+    if robot["range"] == "min":
+        state = max
+        state_i = min
+    else:
+        state = min
+        state_i = max
+    awake_old(robot_List, robot["dest"][0],graph, state, id_List) # ...on réveille le robot correspondant...
+    id_dest = robot["dest"].pop(0)
+    robot["dist"].pop(0)
+    if len(robot["dest"]) == 0:
+        find_Dest_old(robot["id"], id_dest, robot_List, state_i, graph, id_List) # ...et on lui assigne sa destination
+
+def what_to_do3(i,robot_List,graph, id_List):
     """ Second implementation of the algorithm for wakening the robot\n
     Strategy: ???"""
     robot = robot_List[i]
-    awake_old(robot_List, robot["dest"][0],graph, id_List) # ...on réveille le robot correspondant...
+    awake_very_old(robot_List, robot["dest"][0],graph, id_List) # ...on réveille le robot correspondant...
     id_dest = robot["dest"].pop(0)
     robot["dist"].pop(0)
     if len(robot["dest"]) == 0:
@@ -239,12 +261,12 @@ def main():
     print("\n", tour)
     for robot in robot_List:
         print(robot)
-    find_Dest(0, 0, robot_List, min, graph, id_List)
-    rendering(id_List, robot_List, graph, tour)
+    find_Dest_old(0, 0, robot_List, min, graph, id_List)
+    # rendering(id_List, robot_List, graph, tour)
     while not robots_all_awake(robot_List):
         tour +=1
-        move_Robots(robot_List, graph, what_to_do1, id_List)
-        rendering(id_List, robot_List, graph, tour)
+        move_Robots(robot_List, graph, what_to_do2, id_List)
+        # rendering(id_List, robot_List, graph, tour)
         if tour <100:
             print("\n",tour)
             for robot in robot_List:
