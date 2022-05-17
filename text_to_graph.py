@@ -64,33 +64,41 @@ def parse_graph_data(text):
 
     # to get graph
     graph = np.zeros((nb_robot, nb_robot))
-    while k < len(lines) and lines[k][0] == 'E':
-        line = lines[k].split(' : ')
-        data = list(filter(lambda c: c!= '(' and c != ')' and c!= '\n', line[1]))
-        beg = True
-        nb1 = ''
-        nb2 = ''
-        for c in data:
-            if c == ',':
-                beg = False
-            elif beg:
-                nb1 += c
-            else:
-                nb2 += c
-        id1 =  0 if nb1 == 'R' else int(nb1)
-        id2 =  0 if nb2 == 'R' else int(nb2)
-        i = get_correct_index(list_ids, id1)
-        j = get_correct_index(list_ids, id2)
-        dist = distance(robot_list[i]["coord"], robot_list[j]["coord"])
-        graph[j][i] = ceil(dist) 
-        graph[i][j] = ceil(dist)
-        k += 1
+    for i in range(nb_robot):
+        for j in range(nb_robot):
+            dist = distance(robot_list[i]["coord"], robot_list[j]["coord"])
+            graph[j][i] = ceil(dist) 
+            graph[i][j] = ceil(dist)
+            k += 1
+
+    # graph = np.zeros((nb_robot, nb_robot))
+    # while k < len(lines) and lines[k][0] == 'E':
+    #     line = lines[k].split(' : ')
+    #     data = list(filter(lambda c: c!= '(' and c != ')' and c!= '\n', line[1]))
+    #     beg = True
+    #     nb1 = ''
+    #     nb2 = ''
+    #     for c in data:
+    #         if c == ',':
+    #             beg = False
+    #         elif beg:
+    #             nb1 += c
+    #         else:
+    #             nb2 += c
+    #     id1 =  0 if nb1 == 'R' else int(nb1)
+    #     id2 =  0 if nb2 == 'R' else int(nb2)
+    #     i = get_correct_index(list_ids, id1)
+    #     j = get_correct_index(list_ids, id2)
+    #     dist = distance(robot_list[i]["coord"], robot_list[j]["coord"])
+    #     graph[j][i] = ceil(dist) 
+    #     graph[i][j] = ceil(dist)
+    #     k += 1
 
 
     return list_ids, robot_list, graph
 
 if __name__ == "__main__":
-    list_ids, robot_list, graph = parse_graph_data("graphe_intermediaire.txt")
+    list_ids, robot_list, graph = parse_graph_data("mapK10.txt")
     print(list_ids)
     print(robot_list)
     print(graph)
