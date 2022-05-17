@@ -20,7 +20,7 @@ def plot_according_to_N(K):
 
 def plot_according_to_K(N):
     nbs_tour = []
-    Ks = [i for i in range(10, 20, 2)]
+    Ks = [i for i in range(10, 100, 10)]
     for K in Ks:
         value = 0
         for i in range(10):
@@ -37,7 +37,7 @@ def plot_according_to_K(N):
 
 def plot_world1000_K_changing():
     nbs_tour = []
-    Ks = [10, 50, 200, 1000]
+    Ks = [10, 50, 200]
     for K in Ks:
         value = 0
         for i in range(10):
@@ -53,5 +53,5 @@ def plot_world1000_K_changing():
 
 if __name__ == "__main__":
     plot_according_to_N(10)
-    plot_according_to_K(50)
     plot_world1000_K_changing()
+    plot_according_to_K(100)

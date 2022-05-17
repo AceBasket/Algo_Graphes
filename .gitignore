@@ -134,3 +134,4 @@ svgasm
 *.dot
 *.gif
 .vscode
+random_graph.txt

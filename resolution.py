@@ -242,23 +242,15 @@ We also have a robot_List array which contains all the robots (dictionaries) alo
 def main(text_graph): 
     """ The main function, calling all the others, and printing the amount of turns required to wake all robots"""
     id_List,robot_List, graph = parse_graph_data(text_graph)
-    # rendering(id_List, robot_List, graph, 0)
+    rendering(id_List, robot_List, graph, 0)
     tour = 1
-    # print("id: ", id_List, "\n")
-    # print("\n", tour)
-    # for robot in robot_List:
-    #     print(robot)
     find_dest_opti(0, 0, robot_List, min, graph, id_List)
-    # rendering(id_List, robot_List, graph, tour)
+    rendering(id_List, robot_List, graph, tour)
     while not robots_all_awake(robot_List):
         tour +=1
         move_Robots(robot_List, graph, what_to_do_opti, id_List)
-        # rendering(id_List, robot_List, graph, tour)
-        # if tour <100:
-        #     print("\n",tour)
-        #     for robot in robot_List:
-        #         print(robot)
-    print("Robots tous réveillés en ",tour,"tours.")
+        rendering(id_List, robot_List, graph, tour)
+    # print("Robots tous réveillés en ",tour,"tours.")
     return tour
 
 if __name__ == "__main__":
